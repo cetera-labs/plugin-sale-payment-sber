@@ -105,7 +105,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
 
 	public function pay( $return = '' )
 	{
-        if (!$return) $return = getenv('HTTP_REFERER');
+        if (!$return) $return = \Cetera\Application::getInstance()->getServer()->getFullUrl();
         
 		$params = [
 			'userName'    => $this->params['userName'],
