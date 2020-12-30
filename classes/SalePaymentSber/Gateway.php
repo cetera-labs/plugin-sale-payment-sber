@@ -184,4 +184,28 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
 		}        
     }
     
+    public function checkStatus($orderId) {
+		$params = [
+			'userName'    => $this->params['userName'],
+            'password'    => $this->params['password'],
+            'orderId'     => $orderId,
+		]; 
+
+        $url = $this->params["test_mode"]?self::TEST_URL:self::URL;
+        
+        $client = new \GuzzleHttp\Client();
+		$response = $client->request('POST', $url.'/getOrderStatusExtended.do', [
+			'verify' => false,
+			'form_params' => $params
+		]); 
+
+		$res = json_decode($response->getBody(), true);	
+        
+        if ($res['orderStatus'] == 2) {
+            $this->order->paymentSuccess();
+        }
+
+        return $res;
+    }
+    
 }
