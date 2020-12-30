@@ -110,7 +110,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
 		$params = [
 			'userName'    => $this->params['userName'],
             'password'    => $this->params['password'],
-            'orderNumber' => $this->order->id.'-x-'.rand(),
+            'orderNumber' => $this->order->id,
             'amount'      => $this->order->getTotal() * 100,
             'returnUrl'   => $return,
             'taxSystem'   => $this->params['taxSystem'],

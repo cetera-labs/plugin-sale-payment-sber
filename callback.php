@@ -7,7 +7,8 @@ ob_start();
 
 try {
     
-	list($oid) = explode('-x-',$_REQUEST['orderNumber']);
+	//list($oid) = explode('-x-',$_REQUEST['orderNumber']);
+    $oid = $_REQUEST['orderNumber'];
 	$order = \Sale\Order::getById( $_REQUEST['orderNumber'] );
 	$gateway = $order->getPaymentGateway();
     
