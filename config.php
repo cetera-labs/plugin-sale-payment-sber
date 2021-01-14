@@ -8,7 +8,9 @@ if (isset($_GET['orderId'])) {
     try {
         $order = \Sale\Order::getByTransaction($_GET['orderId']);
         $gateway = $order->getPaymentGateway();
-        $res = $gateway->checkStatus($_GET['orderId']);      
+        if ($gateway) {
+            $res = $gateway->checkStatus($_GET['orderId']);  
+        }        
     }
     catch(\Exception $e) {}
 }
