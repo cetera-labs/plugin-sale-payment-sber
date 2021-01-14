@@ -122,34 +122,9 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
         }
         
         if ($this->params['orderBundle']) {
-			$items = [];
-			
-            $i = 1;
-			foreach ($this->order->getProducts() as $p) {
-				$items[] = [
-					'positionId' => $i++,
-                    'name' => $p['name'],
-                    'quantity' => [
-                        'value' => intval($p['quantity']),
-                        'measure' => 'шт.'
-                    ],
-                    'itemCode' => $p['id'],
-                    'tax' => [
-                        'taxType' => $this->params['taxType']
-                    ],
-                    'itemPrice' => $p['price'] * 100,
-                    'itemAttributes' => [
-                        'attributes' => [
-                            ['name' => 'paymentMethod', 'value' => 1],
-                            ['name' => 'paymentObject', 'value' => $this->params['paymentObject']]
-                        ]
-                    ]
-				];
-			}
-
             $params['orderBundle'] = json_encode([
                 'cartItems' => [
-                    'items' => $items
+                    'items' => $this->getItems()
                 ],
             ]);
         }
@@ -183,6 +158,35 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
             }
 		}        
     }
+    
+	public function getItems()
+	{
+        $items = [];
+        
+        $i = 1;
+        foreach ($this->order->getProducts() as $p) {
+            $items[] = [
+                'positionId' => $i++,
+                'name' => $p['name'],
+                'quantity' => [
+                    'value' => intval($p['quantity']),
+                    'measure' => 'шт.'
+                ],
+                'itemCode' => $p['id'],
+                'tax' => [
+                    'taxType' => $this->params['taxType']
+                ],
+                'itemPrice' => $p['price'] * 100,
+                'itemAttributes' => [
+                    'attributes' => [
+                        ['name' => 'paymentMethod', 'value' => 1],
+                        ['name' => 'paymentObject', 'value' => $this->params['paymentObject']]
+                    ]
+                ]
+            ];
+        }
+        return $items;
+    }        
     
     public function checkStatus($orderId) {
 		$params = [
