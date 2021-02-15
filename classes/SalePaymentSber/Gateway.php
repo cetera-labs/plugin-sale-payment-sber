@@ -56,6 +56,21 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
                         [13, 'иной предмет расчёта'],
                     ],
                 ],
+                [
+                    'name'       => 'paymentMethod',
+                    'xtype'      => 'combobox',
+                    'fieldLabel' => 'Тип оплаты',
+                    'value'      => 1,
+                    'store'      => [
+                        [1, 'полная предварительная оплата до момента передачи предмета расчёта'],
+                        [2, 'частичная предварительная оплата до момента передачи предмета расчёта'],
+                        [3, 'аванс'],
+                        [4, 'полная оплата в момент передачи предмета расчёта'],
+                        [5, 'частичная оплата предмета расчёта в момент его передачи с последующей оплатой в кредит'],
+                        [6, 'передача предмета расчёта без его оплаты в момент его передачи с последующей оплатой в кредит'],
+                        [7, 'оплата предмета расчёта после его передачи с оплатой в кредит'],
+                    ],
+                ],                
 				[
 					'name'       => 'taxSystem',
 					'xtype'      => 'combobox',
@@ -179,7 +194,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
                 'itemPrice' => $p['price'] * 100,
                 'itemAttributes' => [
                     'attributes' => [
-                        ['name' => 'paymentMethod', 'value' => 1],
+                        ['name' => 'paymentMethod', 'value' => $this->params['paymentMethod']],
                         ['name' => 'paymentObject', 'value' => $this->params['paymentObject']]
                     ]
                 ]
