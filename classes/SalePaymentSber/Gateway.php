@@ -227,4 +227,11 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
         return $res;
     }
     
+    public static function isRefundAllowed() {
+        return true;
+    }
+    
+    public function refund( $items = null ) {
+    }    
+    
 }
