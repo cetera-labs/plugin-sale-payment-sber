@@ -232,6 +232,72 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
     }
     
     public function refund( $items = null ) {
-    }    
+        $data = $this->getTransactions();
+        
+        //print_r($data);
+        //return;
+        
+        if (!count($data)) {
+            throw new \Exception('Нет информации о платеже');
+        }
+        $orderId = $data[0]['data']['orderId'];
+        
+		$params = [
+			'userName'    => $this->params['userName'],
+            'password'    => $this->params['password'],
+            'orderId'     => $orderId,
+            'amount'      => $this->order->getTotal() * 100,
+		];
+        
+        if ($items !== null) {
+            $i = [];
+            $amount = 0;
+            foreach ($items as $key => $item) {
+                $price = $item['price'] * 100;
+                $amount += intval($item['quantity']) * $price;
+                $i[] = [
+                    'positionId' => $key,
+                    'name'       => $item['name'],
+                    'quantity' => [
+                        'value'   => intval($item['quantity']),
+                        'measure' => 'шт.'
+                    ],
+                    'itemAmount' => intval($item['quantity']) * $price,  
+                    'itemCode'   => $item['id'], 
+                    'itemPrice'  => $price, 
+                ];
+            }
+            
+            $params['refundItems'] = [
+                'items' => $i
+            ]; 
+            $params['amount'] = $amount;
+        }
+        
+        //print_r($params);
+        //return;        
+
+        $url = $this->params["test_mode"]?self::TEST_URL:self::URL;
+        
+        $client = new \GuzzleHttp\Client();
+		$response = $client->request('POST', $url.'/refund.do', [
+			'verify' => false,
+			'form_params' => $params
+		]);
+        
+        $res = json_decode($response->getBody(), true);
+
+		if (!$res['errorCode']) {
+            if ($items = null) {
+                $this->order->setPaid(\Sale\Order::PAY_REFUND)->save();
+            }
+			$this->saveTransaction('refund_'.$res['orderId'], $res);
+			return;		
+		}
+		else {
+            throw new \Exception($res['errorCode'].': '.$res['errorMessage']);
+		}        
+        
+    }
     
 }
