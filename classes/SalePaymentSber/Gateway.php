@@ -240,7 +240,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
         if (!count($data)) {
             throw new \Exception('Нет информации о платеже');
         }
-        $orderId = $data[0]['data']['orderId'];
+        $orderId = $data[count($data)-1]['data']['orderId'];
         
 		$params = [
 			'userName'    => $this->params['userName'],
@@ -253,10 +253,11 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
             $i = [];
             $amount = 0;
             foreach ($items as $key => $item) {
+                if (!$item['checked']) continue;
                 $price = $item['price'] * 100;
                 $amount += intval($item['quantity']) * $price;
                 $i[] = [
-                    'positionId' => $key,
+                    'positionId' => $key+1,
                     'name'       => $item['name'],
                     'quantity' => [
                         'value'   => intval($item['quantity']),
@@ -268,9 +269,9 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
                 ];
             }
             
-            $params['refundItems'] = [
+            $params['refundItems'] = json_encode([
                 'items' => $i
-            ]; 
+            ]); 
             $params['amount'] = $amount;
         }
         
@@ -282,22 +283,18 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
         $client = new \GuzzleHttp\Client();
 		$response = $client->request('POST', $url.'/refund.do', [
 			'verify' => false,
-			'form_params' => $params
+			'form_params' => $params,
 		]);
-        
+
         $res = json_decode($response->getBody(), true);
 
 		if (!$res['errorCode']) {
-            if ($items = null) {
-                $this->order->setPaid(\Sale\Order::PAY_REFUND)->save();
-            }
-			$this->saveTransaction('refund_'.$res['orderId'], $res);
 			return;		
 		}
 		else {
             throw new \Exception($res['errorCode'].': '.$res['errorMessage']);
 		}        
         
-    }
+    } 
     
 }
