@@ -253,17 +253,17 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
             $i = [];
             $amount = 0;
             foreach ($items as $key => $item) {
-                if (!$item['checked']) continue;
+                if ($item['quantity_refund'] <= 0) continue;
                 $price = $item['price'] * 100;
-                $amount += intval($item['quantity']) * $price;
+                $amount += intval($item['quantity_refund']) * $price;
                 $i[] = [
                     'positionId' => $key+1,
                     'name'       => $item['name'],
                     'quantity' => [
-                        'value'   => intval($item['quantity']),
+                        'value'   => intval($item['quantity_refund']),
                         'measure' => 'шт.'
                     ],
-                    'itemAmount' => intval($item['quantity']) * $price,  
+                    'itemAmount' => intval($item['quantity_refund']) * $price,  
                     'itemCode'   => $item['id'], 
                     'itemPrice'  => $price, 
                 ];
