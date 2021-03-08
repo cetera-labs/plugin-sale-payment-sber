@@ -17,7 +17,7 @@ try {
         throw new \Exception('Order check failed');
     }
 		
-	$gateway->saveTransaction($_REQUEST['mdOrder'], $args);
+	$gateway->saveTransaction($_REQUEST['mdOrder'], $_REQUEST);
 		
 	// Операция подтверждена
 	if  ($_REQUEST['operation'] == 'deposited' && $_REQUEST['status'] > 0) {
