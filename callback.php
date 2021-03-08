@@ -37,4 +37,4 @@ catch (\Exception $e) {
 
 $data = ob_get_contents();
 ob_end_flush();
-file_put_contents(__DIR__.'/log'.time().'.txt', $data);
+//file_put_contents(__DIR__.'/log'.time().'.txt', $data);
