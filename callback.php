@@ -30,9 +30,9 @@ try {
 }
 catch (\Exception $e) {
 	
-	header("HTTP/1.1 500 ".$e->getMessage());
+	header( "HTTP/1.1 500 ".trim(preg_replace('/\s+/', ' ', $e->getMessage())) );
 	print $e->getMessage();
-	
+	 
 }
 
 $data = ob_get_contents();
