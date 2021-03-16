@@ -150,7 +150,10 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
                 ];
                 if ($phone) {
                     $orderBundle['customerDetails']['phone'] = $phone;
-                }                 
+                }  
+                if ($this->order->getName()) {
+                    $orderBundle['customerDetails']['fullName'] = $this->order->getName();
+                }
             }            
             $params['orderBundle'] = json_encode($orderBundle);
         }
