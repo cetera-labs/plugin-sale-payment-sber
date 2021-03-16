@@ -135,13 +135,32 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
         if (isset($this->currency[$this->order->getCurrency()->code])) {
             $params['currency'] = $this->currency[$this->order->getCurrency()->code];
         }
+
+        $phone = preg_replace('/\D/','',$this->order->getPhone());
         
         if ($this->params['orderBundle']) {
-            $params['orderBundle'] = json_encode([
+            $orderBundle = [
                 'cartItems' => [
                     'items' => $this->getItems()
                 ],
-            ]);
+            ];
+            if ($this->order->getEmail()) {
+                $orderBundle['customerDetails'] = [
+                    'email' => $this->order->getEmail()
+                ];
+                if ($phone) {
+                    $orderBundle['customerDetails']['phone'] = $phone;
+                }                 
+            }            
+            $params['orderBundle'] = json_encode($orderBundle);
+        }
+        else {
+            if ($this->order->getEmail()) {
+                $params['email'] = $this->order->getEmail();
+            }
+            if ($phone) {
+                $params['phone'] = $phone;
+            }            
         }
         
         $url = $this->params["test_mode"]?self::TEST_URL:self::URL;
