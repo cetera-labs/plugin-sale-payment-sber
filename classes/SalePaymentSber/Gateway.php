@@ -262,7 +262,20 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
         if (!count($data)) {
             throw new \Exception('Нет информации о платеже');
         }
-        $orderId = $data[count($data)-1]['data']['orderId'];
+        $orderId = null;
+        foreach ($data as $d) {
+            if (isset($d['data']['orderId'])) {
+                $orderId = $d['data']['orderId'];
+                break;
+            }
+            if (isset($d['data']['mdOrder'])) {
+                $orderId = $d['data']['mdOrder'];
+                break;
+            }            
+        }
+        if (!$orderId) {
+            throw new \Exception('Не получилось определить параметры платежа');
+        }        
         
 		$params = [
 			'userName'    => $this->params['userName'],
