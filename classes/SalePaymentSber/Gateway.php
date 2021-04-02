@@ -225,7 +225,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
         return $items;
     }        
     
-    public function checkStatus() {
+    public function getStatus() {
 		$params = [
 			'userName'    => $this->params['userName'],
             'password'    => $this->params['password'],
