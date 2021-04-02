@@ -225,11 +225,11 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
         return $items;
     }        
     
-    public function checkStatus($orderId) {
+    public function checkStatus() {
 		$params = [
 			'userName'    => $this->params['userName'],
             'password'    => $this->params['password'],
-            'orderId'     => $orderId,
+            'orderId'     => $this->getOrderId(),
 		]; 
 
         $url = $this->params["test_mode"]?self::TEST_URL:self::URL;
@@ -242,10 +242,6 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
 
 		$res = json_decode($response->getBody(), true);	
         
-        if ($res['orderStatus'] == 2) {
-            $this->order->paymentSuccess();
-        }
-
         return $res;
     }
     
@@ -253,11 +249,8 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
         return true;
     }
     
-    public function refund( $items = null ) {
+    private function getOrderId() {
         $data = $this->getTransactions();
-        
-        //print_r($data);
-        //return;
         
         if (!count($data)) {
             throw new \Exception('Нет информации о платеже');
@@ -275,12 +268,17 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
         }
         if (!$orderId) {
             throw new \Exception('Не получилось определить параметры платежа');
-        }        
-        
+        }
+
+        return $orderId;
+    }
+    
+    public function refund( $items = null ) {
+              
 		$params = [
 			'userName'    => $this->params['userName'],
             'password'    => $this->params['password'],
-            'orderId'     => $orderId,
+            'orderId'     => $this->getOrderId(),
             'amount'      => $this->order->getTotal() * 100,
 		];
         
