@@ -135,13 +135,35 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
         if (isset($this->currency[$this->order->getCurrency()->code])) {
             $params['currency'] = $this->currency[$this->order->getCurrency()->code];
         }
+
+        $phone = preg_replace('/\D/','',$this->order->getPhone());
         
         if ($this->params['orderBundle']) {
-            $params['orderBundle'] = json_encode([
+            $orderBundle = [
                 'cartItems' => [
                     'items' => $this->getItems()
                 ],
-            ]);
+            ];
+            if ($this->order->getEmail()) {
+                $orderBundle['customerDetails'] = [
+                    'email' => $this->order->getEmail()
+                ];
+                if ($phone) {
+                    $orderBundle['customerDetails']['phone'] = $phone;
+                }  
+                if ($this->order->getName()) {
+                    $orderBundle['customerDetails']['fullName'] = $this->order->getName();
+                }
+            }            
+            $params['orderBundle'] = json_encode($orderBundle);
+        }
+        else {
+            if ($this->order->getEmail()) {
+                $params['email'] = $this->order->getEmail();
+            }
+            if ($phone) {
+                $params['phone'] = $phone;
+            }            
         }
         
         $url = $this->params["test_mode"]?self::TEST_URL:self::URL;
@@ -203,11 +225,11 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
         return $items;
     }        
     
-    public function checkStatus($orderId) {
+    public function getStatus() {
 		$params = [
 			'userName'    => $this->params['userName'],
             'password'    => $this->params['password'],
-            'orderId'     => $orderId,
+            'orderId'     => $this->getOrderId(),
 		]; 
 
         $url = $this->params["test_mode"]?self::TEST_URL:self::URL;
@@ -220,11 +242,92 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
 
 		$res = json_decode($response->getBody(), true);	
         
-        if ($res['orderStatus'] == 2) {
-            $this->order->paymentSuccess();
-        }
-
         return $res;
     }
+    
+    public static function isRefundAllowed() {
+        return true;
+    }
+    
+    private function getOrderId() {
+        $data = $this->getTransactions();
+        
+        if (!count($data)) {
+            throw new \Exception('Нет информации о платеже');
+        }
+        $orderId = null;
+        foreach ($data as $d) {
+            if (isset($d['data']['orderId'])) {
+                $orderId = $d['data']['orderId'];
+                break;
+            }
+            if (isset($d['data']['mdOrder'])) {
+                $orderId = $d['data']['mdOrder'];
+                break;
+            }            
+        }
+        if (!$orderId) {
+            throw new \Exception('Не получилось определить параметры платежа');
+        }
+
+        return $orderId;
+    }
+    
+    public function refund( $items = null ) {
+              
+		$params = [
+			'userName'    => $this->params['userName'],
+            'password'    => $this->params['password'],
+            'orderId'     => $this->getOrderId(),
+            'amount'      => $this->order->getTotal() * 100,
+		];
+        
+        if ($items !== null) {
+            $i = [];
+            $amount = 0;
+            foreach ($items as $key => $item) {
+                if ($item['quantity_refund'] <= 0) continue;
+                $price = $item['price'] * 100;
+                $amount += intval($item['quantity_refund']) * $price;
+                $i[] = [
+                    'positionId' => $key+1,
+                    'name'       => $item['name'],
+                    'quantity' => [
+                        'value'   => intval($item['quantity_refund']),
+                        'measure' => 'шт.'
+                    ],
+                    'itemAmount' => intval($item['quantity_refund']) * $price,  
+                    'itemCode'   => $item['id'], 
+                    'itemPrice'  => $price, 
+                ];
+            }
+            
+            $params['refundItems'] = json_encode([
+                'items' => $i
+            ]); 
+            $params['amount'] = $amount;
+        }
+        
+        //print_r($params);
+        //return;        
+
+        $url = $this->params["test_mode"]?self::TEST_URL:self::URL;
+        
+        $client = new \GuzzleHttp\Client();
+		$response = $client->request('POST', $url.'/refund.do', [
+			'verify' => false,
+			'form_params' => $params,
+		]);
+
+        $res = json_decode($response->getBody(), true);
+
+		if (!$res['errorCode']) {
+			return;		
+		}
+		else {
+            throw new \Exception($res['errorCode'].': '.$res['errorMessage']);
+		}        
+        
+    } 
     
 }
