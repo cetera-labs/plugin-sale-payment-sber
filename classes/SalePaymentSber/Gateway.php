@@ -111,7 +111,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
                 [
 					'xtype'      => 'displayfield',
 					'fieldLabel' => 'URL-адрес для callback уведомлений',
-					'value'      => '//'.$_SERVER['HTTP_HOST'].'/plugins/sale_payment_sberbank/callback.php'
+					'value'      => '//'.$_SERVER['HTTP_HOST'].'/cms/plugins/sale-payment-sber/callback.php'
 				],							
 				
 			]			
