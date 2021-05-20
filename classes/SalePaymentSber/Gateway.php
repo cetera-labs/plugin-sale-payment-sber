@@ -120,6 +120,12 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
 
 	public function pay( $return = '' )
 	{
+        header('Location: '.$this->getPayUrl( $return ));
+        die();          
+	}
+
+    public function getPayUrl( $return = '' )
+	{
         if (!$return) $return = \Cetera\Application::getInstance()->getServer()->getFullUrl();
         
 		$params = [
@@ -178,8 +184,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
 		
 		if (!$res['errorCode']) {
 			$this->saveTransaction($res['orderId'], $res);
-			header('Location: '.$res['formUrl']);
-			die();				
+			return $res['formUrl'];			
 		}
 		else {
             if ($this->params["test_mode"]) {
