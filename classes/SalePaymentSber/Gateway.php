@@ -161,7 +161,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
         die();          
 	}
 
-    public function getPayUrl( $return = '' )
+    public function getPayUrl( $return = '', $payParams = [] )
 	{
         if (!$return) $return = \Cetera\Application::getInstance()->getServer()->getFullUrl();
         
