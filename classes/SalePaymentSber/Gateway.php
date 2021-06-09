@@ -117,8 +117,45 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
 			]			
 		]; 
     }
+    
+    public function cancel( )
+    {
+		$params = [
+			'userName'    => $this->params['userName'],
+            'password'    => $this->params['password'],
+            'orderNumber' => $this->order->id,
+		]; 
+        
+        $url = $this->params["test_mode"]?self::TEST_URL:self::URL;
+        
+        $client = new \GuzzleHttp\Client();
+		$response = $client->request('POST', $url.'/decline.do', [
+			'verify' => false,
+			'form_params' => $params
+		]);
 
-	public function pay( $return = '' )
+		$res = json_decode($response->getBody(), true);				
+		
+		if (!$res['errorCode']) {
+			$this->saveTransaction($res['orderId'], $res);
+			$this->order->setPaid(\Sale\Order::PAY_CANCEL)->save();		
+		}
+		else {
+            if ($this->params["test_mode"]) {
+                print "<pre>Ошибка\n";
+                print_r($res);
+                print "\n\n\nДанные запроса\n";
+                print_r($params);
+                print "</pre>";
+                die();
+            }
+            else {
+                throw new \Exception($res['errorCode'].': '.$res['errorMessage']);
+            }
+		} 
+    }
+
+	public function pay( $return = '', $payParams = [] )
 	{
         if (!$return) $return = \Cetera\Application::getInstance()->getServer()->getFullUrl();
         
@@ -131,6 +168,10 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
             'taxSystem'   => $this->params['taxSystem'],
             'additionalOfdParams' => []
 		]; 
+        
+        if (isset($payParams['timeout'])) {
+            $params['sessionTimeoutSecs'] = $payParams['timeout'];
+        }
         
         if (isset($this->currency[$this->order->getCurrency()->code])) {
             $params['currency'] = $this->currency[$this->order->getCurrency()->code];
