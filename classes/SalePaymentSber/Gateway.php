@@ -305,27 +305,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
         }
         return $items;
     }        
-    
-    public function getStatus() {
-		$params = [
-			'userName'    => $this->params['userName'],
-            'password'    => $this->params['password'],
-            'orderId'     => $this->getOrderId(),
-		]; 
-
-        $url = $this->params["test_mode"]?self::TEST_URL:self::URL;
         
-        $client = new \GuzzleHttp\Client();
-		$response = $client->request('POST', $url.'/getOrderStatusExtended.do', [
-			'verify' => false,
-			'form_params' => $params
-		]); 
-
-		$res = json_decode($response->getBody(), true);	
-        
-        return $res;
-    }
-    
     public static function isRefundAllowed() {
         return true;
     }
