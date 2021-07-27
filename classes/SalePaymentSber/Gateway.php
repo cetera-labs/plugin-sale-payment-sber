@@ -160,6 +160,41 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
         header('Location: '.$this->getPayUrl( $return ));
         die();          
 	}
+    
+	public function getStatus() {
+		$params = [
+			'userName'    => $this->params['userName'],
+            'password'    => $this->params['password'],
+            'orderNumber' => $this->order->id,
+		]; 
+
+        $url = $this->params["test_mode"]?self::TEST_URL:self::URL;
+        
+        $client = new \GuzzleHttp\Client();
+		$response = $client->request('POST', $url.'/getOrderStatusExtended.do', [
+			'verify' => false,
+			'form_params' => $params
+		]); 
+
+		$res = json_decode($response->getBody(), true);				
+		
+		if (!$res['errorCode']) {
+			return $res;
+		}
+		else {
+            if ($this->params["test_mode"]) {
+                print "<pre>Ошибка\n";
+                print_r($res);
+                print "\n\n\nДанные запроса\n";
+                print_r($params);
+                print "</pre>";
+                die();
+            }
+            else {
+                throw new \Exception($res['errorCode'].': '.$res['errorMessage']);
+            }
+		}        
+	}  
 
     public function getPayUrl( $return = '', $payParams = [] )
 	{
