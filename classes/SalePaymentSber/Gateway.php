@@ -126,7 +126,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
             'orderNumber' => $this->order->id,
 		]; 
         
-        $url = $this->params["test_mode"]?self::TEST_URL:self::URL;
+        $url = (isset($this->params["test_mode"]) && $this->params["test_mode"])?self::TEST_URL:self::URL;
         
         $client = new \GuzzleHttp\Client();
 		$response = $client->request('POST', $url.'/decline.do', [
