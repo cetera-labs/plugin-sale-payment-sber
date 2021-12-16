@@ -42,7 +42,7 @@ if ($this->getBo()) {
 
     $this->getBo()->addEditor(array(
         'id'    => EDITOR_TEXT_SBER_PAYMENT_OBJECT,
-        'alias' => 'editor_text_SBER_tax',
+        'alias' => 'editor_text_SBER_payment_object',
         'name'  => $t->_('Редактор Sber Тип оплачиваемой позиции')
     ));
     $this->getBo()->addPseudoField(array(
@@ -55,7 +55,7 @@ if ($this->getBo()) {
 
     $this->getBo()->addEditor(array(
         'id'    => EDITOR_TEXT_SBER_PAYMENT_METHOD,
-        'alias' => 'editor_text_SBER_tax',
+        'alias' => 'editor_text_SBER_payment_method',
         'name'  => $t->_('Редактор Sber Тип оплаты')
     ));
     $this->getBo()->addPseudoField(array(
