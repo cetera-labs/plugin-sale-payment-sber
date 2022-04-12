@@ -1,7 +1,7 @@
 <?php
 namespace SalePaymentSber;
 
-class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
+class Gateway extends \Sale\PaymentGateway\GatewayAtol {
     
     const TEST_URL = 'https://3dsec.sberbank.ru/payment/rest';
     const URL = 'https://securepayments.sberbank.ru/payment/rest';
@@ -10,8 +10,8 @@ class Gateway extends \Sale\PaymentGateway\GatewayAbstract {
         'RUR' => 810,
         'RUB' => 643
     ];
-    
-	public static function getInfo()
+
+    public static function getInfo2()
 	{    
 		return [
 			'name'        => 'Сбербанк',
