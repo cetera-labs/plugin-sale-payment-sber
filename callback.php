@@ -22,7 +22,7 @@ try {
 	// Операция подтверждена
 	if  ($_REQUEST['operation'] == 'deposited' && $_REQUEST['status'] > 0) {
 		$order->paymentSuccess();
-        $gateway->sendRecieptSell();
+        $gateway->sendReceiptSell();
 	}
 	
 	header("HTTP/1.1 200 OK");

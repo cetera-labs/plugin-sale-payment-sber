@@ -383,6 +383,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAtol {
         $res = json_decode($response->getBody(), true);
 
 		if (!$res['errorCode']) {
+            $res = $this->sendReceiptRefund( $items );
 			return;		
 		}
 		else {
