@@ -24,7 +24,7 @@ try {
 		$order->paymentSuccess();
 		try {
 			$gateway->sendReceiptSell();
-		catch (\Exception $e) {}
+		} catch (\Exception $e) {}
 	}
 	
 	header("HTTP/1.1 200 OK");
