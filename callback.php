@@ -35,6 +35,7 @@ catch (\Exception $e) {
 	
 	header( "HTTP/1.1 500 ".trim(preg_replace('/\s+/', ' ', $e->getMessage())) );
 	print $e->getMessage();
+    file_put_contents(DOCROOT.'../logs/sale-payment-sber-error.log', date('Y.m.d H:i:s')." ".$_SERVER['QUERY_STRING']." ".$e->getMessage()."\n", FILE_APPEND);
 	 
 }
 
