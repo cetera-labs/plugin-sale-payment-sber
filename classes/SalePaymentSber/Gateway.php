@@ -136,7 +136,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAtol {
 
 		$res = json_decode($response->getBody(), true);				
 		
-		if (!$res['errorCode']) {
+		if (!isset($res['errorCode'])) {
 			$this->saveTransaction($res['orderId'], $res);
 			$this->order->setPaid(\Sale\Order::PAY_CANCEL)->save();		
 		}
@@ -178,7 +178,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAtol {
 
 		$res = json_decode($response->getBody(), true);				
 		
-		if (!$res['errorCode']) {
+		if (!isset($res['errorCode'])) {
 			return $res;
 		}
 		else {
@@ -258,7 +258,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAtol {
 
 		$res = json_decode($response->getBody(), true);				
 		
-		if (!$res['errorCode']) {
+		if (!isset($res['errorCode'])) {
 			$this->saveTransaction($res['orderId'], $res);
 			return $res['formUrl'];			
 		}
@@ -382,7 +382,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAtol {
 
         $res = json_decode($response->getBody(), true);
 
-		if (!$res['errorCode']) {
+		if (!isset($res['errorCode'])) {
             $res = $this->sendReceiptRefund( $items );
 			return;		
 		}
