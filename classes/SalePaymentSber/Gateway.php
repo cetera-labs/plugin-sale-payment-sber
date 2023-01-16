@@ -141,7 +141,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAtol {
 			$this->order->setPaid(\Sale\Order::PAY_CANCEL)->save();		
 		}
 		else {
-            if ($this->params["test_mode"]) {
+            if (isset($this->params["test_mode"]) && $this->params["test_mode"]) {
                 print "<pre>Ошибка\n";
                 print_r($res);
                 print "\n\n\nДанные запроса\n";
@@ -168,7 +168,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAtol {
             'orderNumber' => $this->order->id,
 		]; 
 
-        $url = $this->params["test_mode"]?self::TEST_URL:self::URL;
+        $url = (isset($this->params["test_mode"]) && $this->params["test_mode"])?self::TEST_URL:self::URL;
         
         $client = new \GuzzleHttp\Client();
 		$response = $client->request('POST', $url.'/getOrderStatusExtended.do', [
@@ -182,7 +182,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAtol {
 			return $res;
 		}
 		else {
-            if ($this->params["test_mode"]) {
+            if (isset($this->params["test_mode"]) && $this->params["test_mode"]) {
                 print "<pre>Ошибка\n";
                 print_r($res);
                 print "\n\n\nДанные запроса\n";
@@ -248,7 +248,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAtol {
             }            
         }
         
-        $url = $this->params["test_mode"]?self::TEST_URL:self::URL;
+        $url = (isset($this->params["test_mode"]) && $this->params["test_mode"])?self::TEST_URL:self::URL;
         
         $client = new \GuzzleHttp\Client();
 		$response = $client->request('POST', $url.'/register.do', [
@@ -263,7 +263,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAtol {
 			return $res['formUrl'];			
 		}
 		else {
-            if ($this->params["test_mode"]) {
+            if (isset($this->params["test_mode"]) && $this->params["test_mode"]) {
                 print "<pre>Ошибка\n";
                 print_r($res);
                 print "\n\n\nДанные запроса\n";
