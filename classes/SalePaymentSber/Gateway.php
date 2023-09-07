@@ -125,9 +125,12 @@ class Gateway extends \Sale\PaymentGateway\GatewayAtol {
             'password'    => $this->params['password'],
             'orderNumber' => $this->order->id,
 		]; 
-        
-        $url = (isset($this->params["test_mode"]) && $this->params["test_mode"])?self::TEST_URL:self::URL;
-        
+        if (getenv('RUN_MODE', true) === 'development') {
+            $url = self::TEST_URL;
+        }
+        else{
+            $url = (isset($this->params["test_mode"]) && $this->params["test_mode"])?self::TEST_URL:self::URL;
+        }
         $client = new \GuzzleHttp\Client();
 		$response = $client->request('POST', $url.'/decline.do', [
 			'verify' => false,
@@ -168,8 +171,12 @@ class Gateway extends \Sale\PaymentGateway\GatewayAtol {
             'orderNumber' => $this->order->id,
 		]; 
 
-        $url = (isset($this->params["test_mode"]) && $this->params["test_mode"])?self::TEST_URL:self::URL;
-        
+        if (getenv('RUN_MODE', true) === 'development') {
+            $url = self::TEST_URL;
+        }
+        else{
+            $url = (isset($this->params["test_mode"]) && $this->params["test_mode"])?self::TEST_URL:self::URL;
+        }
         $client = new \GuzzleHttp\Client();
 		$response = $client->request('POST', $url.'/getOrderStatusExtended.do', [
 			'verify' => false,
@@ -248,8 +255,12 @@ class Gateway extends \Sale\PaymentGateway\GatewayAtol {
             }            
         }
         
-        $url = (isset($this->params["test_mode"]) && $this->params["test_mode"])?self::TEST_URL:self::URL;
-        
+        if (getenv('RUN_MODE', true) === 'development') {
+            $url = self::TEST_URL;
+        }
+        else{
+            $url = (isset($this->params["test_mode"]) && $this->params["test_mode"])?self::TEST_URL:self::URL;
+        }
         $client = new \GuzzleHttp\Client();
 		$response = $client->request('POST', $url.'/register.do', [
 			'verify' => false,
@@ -372,14 +383,19 @@ class Gateway extends \Sale\PaymentGateway\GatewayAtol {
         //print_r($params);
         //return;        
 
-        $url = $this->params["test_mode"]?self::TEST_URL:self::URL;
+        if (getenv('RUN_MODE', true) === 'development') {
+            $url = self::TEST_URL;
+        }
+        else{
+            $url = (isset($this->params["test_mode"]) && $this->params["test_mode"])?self::TEST_URL:self::URL;
+        }
         
         $client = new \GuzzleHttp\Client();
 		$response = $client->request('POST', $url.'/refund.do', [
 			'verify' => false,
 			'form_params' => $params,
 		]);
-
+        
         $res = json_decode($response->getBody(), true);
 
 		if (!isset($res['errorCode'])  || (isset($res['errorCode']) && $res['errorCode'] == 0)) {
