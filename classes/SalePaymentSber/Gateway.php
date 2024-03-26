@@ -185,7 +185,7 @@ class Gateway extends \Sale\PaymentGateway\GatewayAtol {
 
 		$res = json_decode($response->getBody(), true);				
 		
-		if (!isset($res['errorCode'])) {
+		if (!isset($res['errorCode']) || $res['errorCode'] == "0" ) {
 			return $res;
 		}
 		else {
